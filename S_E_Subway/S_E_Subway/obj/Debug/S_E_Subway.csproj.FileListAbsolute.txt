@@ -1,0 +1,6 @@
+C:\Users\forever\Documents\GitHub\BeiJingSubway\S_E_Subway\S_E_Subway\bin\Debug\S_E_Subway.exe.config
+C:\Users\forever\Documents\GitHub\BeiJingSubway\S_E_Subway\S_E_Subway\bin\Debug\S_E_Subway.exe
+C:\Users\forever\Documents\GitHub\BeiJingSubway\S_E_Subway\S_E_Subway\bin\Debug\S_E_Subway.pdb
+C:\Users\forever\Documents\GitHub\BeiJingSubway\S_E_Subway\S_E_Subway\obj\Debug\S_E_Subway.csprojResolveAssemblyReference.cache
+C:\Users\forever\Documents\GitHub\BeiJingSubway\S_E_Subway\S_E_Subway\obj\Debug\S_E_Subway.exe
+C:\Users\forever\Documents\GitHub\BeiJingSubway\S_E_Subway\S_E_Subway\obj\Debug\S_E_Subway.pdb
