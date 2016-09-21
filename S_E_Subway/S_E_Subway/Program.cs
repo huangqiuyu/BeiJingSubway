@@ -17,11 +17,32 @@ namespace S_E_Subway
         {
             
             maps.initial();
+      
+
+            if (args[0]=="-b")
+            {
+                maps.shortest(args[1],args[2]);
+            }
+            else if(args[0]=="-c")
+            {
+
+            }
+            else if(args[0]=="-a")
+            {
+
+            }
+          
             while(true)
-              maps.printLine(Console.ReadLine());
+            {
+                string s = Console.ReadLine();
+                if (s == "exit")
+                    break;
+                maps.printLine(s);
+            }
+            Console.WriteLine("The program is end. (*^__^*) ");
         }
 
-        
+
     }
 }
 
@@ -73,19 +94,37 @@ class station
         belong.Add(i);
     }
 
+    public List<int> getBelong()
+    {
+        return belong;
+    }
+
 }
 
 class map
 {
+    private const int MAX = 300;
     private List<station> stations;
     private List<line> lines;
 
     private int idAmount;
 
+    //used to BFS
+    private int[] prevStation;
+    private int[] minLen;
+    private int[] minBelong;
+
+    private LinkedList<station> shortWay;
+
     public  map()
     {
         stations = new List<station>();
         lines = new List<line>();
+        prevStation = new int[MAX];
+        minLen = new int[MAX];
+        minBelong = new int[MAX];
+        shortWay = new LinkedList<station>();
+
         idAmount = 1;
     }
 
@@ -254,6 +293,17 @@ class map
         return null;
     }
 
+    private station findStation(int n)
+    {
+        for (int i = 0; i < stations.Count(); i++)
+        {
+            if (n == stations[i].getId())
+                return stations[i];
+        }
+
+        return null;
+    }
+
     public void printLine(string lineName)
     {
         if(isFindLine(lineName))
@@ -263,7 +313,7 @@ class map
 
         else
         {
-            Console.WriteLine("Error!\nThere have not that line!");
+            Console.WriteLine("Error!\nThere have not that line!\nPlease input the subway line again!");
         }
     }
 
@@ -290,6 +340,152 @@ class map
         return null;
     }
 
+    private line findLine(int n)
+    {
+        for (int i = 0; i < lines.Count(); i++)
+        {
+            if (n == lines[i].getId())
+                return lines[i];
+        }
+
+        return null;
+    }
+
+    public void shortest(string a,string b)
+    {
+        if(isFind(a)&&isFind(b))
+        {
+            station aa = findStation(a);
+            station bb = findStation(b);
+            bfs(aa, bb);
+            recover(aa, bb);
+            printShort(aa, bb);
+        }
+
+        else
+        {
+            Console.WriteLine("Error!\nThere have not that station!\n");
+        }
+    }
+
+    private void bfs(station a,station b)
+    {
+        int[] visit = new int[MAX];
+        //initial
+        for(int i = 0;i<MAX;i++)
+        {
+            visit[i] = 0;
+            prevStation[i] = -1;
+            minLen[i] = 0;
+
+        }
+
+        List<station> queue = new List<station>();
+        queue.Add(a);
+
+        while(queue.Count!=0)
+        {
+            Boolean isB = false;
+            station current = queue[0];
+            queue.RemoveAt(0);
+            visit[current.getId()] = 1;
+            List<int> nearby = current.getNearby();
+            for(int i=0;i<nearby.Count();i++)
+            {
+                int nearId = nearby[i];
+                
+                station temp = findStation(nearId);
+                if(visit[temp.getId()]==0)
+                {
+                    prevStation[temp.getId()] = current.getId();
+                    visit[temp.getId()] = 1;
+                    minLen[temp.getId()] = minLen[current.getId()] + 1;
+                    queue.Add(temp);
+                }
+                if (nearId == b.getId())
+                {
+                    isB = true;
+                    break;
+                }
+            }
+
+            if (isB)
+                break;
+
+        }
+
+    }
+
+
+    private void recover(station a,station b)
+    {
+        //recover the way
+        shortWay.AddFirst(b);
+        station temp = b;
+        while(prevStation[temp.getId()]!=a.getId())
+        {
+            temp = findStation(prevStation[temp.getId()]);
+            shortWay.AddFirst(temp);
+
+        }
+        shortWay.AddFirst(a);
+
+
+
+        //find the transfer
+        int i = 0;
+        station p = shortWay.ElementAt(0);
+        List<int> preBelong = p.getBelong();
+        station c;
+        List<int> curBelong;
+        while(i<(shortWay.Count()-1))
+        {
+            c = shortWay.ElementAt(i+1);
+            curBelong = c.getBelong();
+
+
+            //find which line of the transfer station belonging 
+            for (int j = 0; j < preBelong.Count(); j++)
+            {
+                int tempPre = preBelong[j];
+                for(int r = 0;r<curBelong.Count();r++)
+                {
+                    int tempCur = curBelong[r];
+                    if(tempPre==tempCur)
+                    {
+                        minBelong[i] = tempPre;
+                        break;
+                    }
+                }
+            }
+            p = c;
+            preBelong = curBelong;
+
+            i++;
+        }
+
+    }
+
+
+    private void printShort(station a,station b)
+    {
+        Console.WriteLine(minLen[b.getId()]+1);
+        Console.WriteLine(a.getName());
+
+        for (int i = 1;i<shortWay.Count();i++)
+        {
+            if(minBelong[i-1]!=minBelong[i]&&minBelong[i]!=0&&minBelong[i-1]!=0)
+            {
+                Console.WriteLine(shortWay.ElementAt(i).getName() + "换乘地铁" + findLine(minBelong[i]).getName());
+                
+            }
+            else
+            {
+                Console.WriteLine(shortWay.ElementAt(i).getName());
+
+            }
+        }
+    }
 }
 
 class line
